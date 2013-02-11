@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!-- device-width ali 320 ali target-densityDpi=device-dpi; -->
+        <meta name="viewport" content="width=device-width; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no">
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <title>Obračun plač - DEMO</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/cordova.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/helper.js"></script>
+    <script type="text/javascript" src="js/control.js"></script>
+    <script type="text/javascript" src="js/jquery.mobile.min.js"></script>
+    <script type="text/javascript" src="js/jquery.path.js"></script>
+
+            <script type="text/javascript">
+                
+                //prevent moving of content
+                document.addEventListener('touchmove', function(event) {
+                                          event.preventDefault();
+                                          }, false);
+                
+                $(document).ready(function() {
+                                  calculate(); // init
+                                  rotate(rEnd);
+                                  
+                                  // resolution init
+                                  $wheel = $('#wheel');
+                                  wheelWidth = $wheel.width();
+                                  wheelOffset = {top: ((screenHeight-wheelWidth)-3), left: ((screenWidth-wheelWidth)/2) }; //top: -30px from bottom
+                                  $('#app-frame').width(screenWidth).height(screenHeight);
+                                  $wheel.offset(wheelOffset);
+                                  $('#wheel-ghost').offset(wheelOffset);
+                                  
+                                  // dimension of app-frame
+                                  var bWidth = $('#app-frame').width();
+                                  var bHeight = $('#app-frame').height();
+                                  
+                                  // bind events
+                                  $('#wheel').bind('vmousedown',function(e){
+                                                   var coordinates = areaToCoornite(bWidth, bHeight, e.pageY, e.pageX);
+                                                   var r = xyToDeg(coordinates.y, coordinates.x);
+                                                   rClick = r;
+                                                   rDiff = rEnd - rClick;
+                                                   });
+                                  
+                                  $('#wheel').bind('vmousemove',function(e){
+                                                   var coordinates = areaToCoornite(bWidth, bHeight, e.pageY, e.pageX);
+                                                   var r = xyToDeg(coordinates.y, coordinates.x) + rDiff;
+                                                   rStart = r;
+                                                   
+                                                   var diff = (rEnd - rStart);
+                                                   if (diff > 200) {diff -= 360};
+                                                   if (diff < -200) {diff += 360};
+                                                   diff = diff * 0.5;
+                                                   currValue = (currValue + diff);
+                                                   rEnd = rStart;
+                                                   calculate(); //refresh numbers                        
+                                                   rotate(r); // rotate wheel
+                                                   });
+                                  
+                                  $('#inp').keyup(function(){
+                                                  var inpVal = parseFloat($('#inp').val());
+                                                  currValue = inpVal;
+                                                  calculate();
+                                                  });
+                                  $('#top-inp').click(function(){putInput()});
+                                  
+                                  opla.icon.bind(); //init
+                                  
+                                  // buttons
+                                  opla.buttons.bind();
+                                  
+                                  // default states
+                                  opla.icon.update();
+                                  
+                                  });
+                </script>    
+    </head>
+    
+    
+    <body>
+        <input  id="inp" type="tel"></input>
+        <div style="" id="app-frame" class="front">
+            <div id="main" class="page">
+                <div id="top-inp"></div>
+                
+                <div id="type">
+                    <div style="width: 45px;" class="icon toggle" >Neto</div>
+                    <div style="width: 50px;" class="icon toggle" >Bruto</div>
+                    <div style="width: 95px;" class="icon toggle" >Str. delod.</div>
+                    <br class="clear" />
+                </div>
+                <div id="detail">
+                    <div id="val1" class="values"></div>
+                    <div id="val2" class="values"></div>
+                    <div id="val3" class="values"></div>
+                    <div id="val4" class="values"></div>
+                    <div id="valInfo" class="values"></div>
+                </div>
+                <div class="icons">
+                    <div class="icon baby num" >0</div>
+                    <div class="icon people num" >0</div>
+                    <div class="icon help num" >0</div>
+                    <div class="icon old65" ></div>
+                    <div class="icon handicap" ></div>
+                    <div class="icon under-over" ></div>
+                    <br class="clear" />
+                </div>
+                <!-- <div id="wheel-ghost"></div> -->
+                <div id="holder"></div>
+                <div id="wheel"></div>
+                <div class="button setup"></div>
+                <div class="button info"></div>
+            </div>
+            <div id="setup" class="page">
+                <h2>Nastavitve aplikacije OPLA</h2>
+                <div class="wrapper">
+                    <div class="icons">
+                        <ul>
+                            <li id="baby"><label>Število vzdrževanih otrok</label><div class="icon baby num" >0</div><div class="control minus"></div><div class="control plus"></div></li>
+                            <li id="help"><label class="double">Št. vzdrževanih otrok, ki potrebujejo pos. nego:</label><div class="icon help num" >0</div><div class="control minus"></div><div class="control plus"></div></li>
+                            <li id="people"><label class="double">Število ostalih vzdrževanih družinskih članov:</label><div class="icon people num" >0</div><div class="control minus"></div><div class="control plus"></div></li>
+                            <li id="old65"><label>Po 65. letu starosti:</label><div class="icon old65" ></div><div class="control onoff"></div></li>
+                            <li id="handicap"><label>100% invalid:</label><div class="icon handicap" ></div><div class="control onoff"></div></li>
+                            <li id="under"><label class="double">Višina letnih dohodkov ne presega 10.342,8€:</label><div class="icon under active" ></div><div class="control onoff"></div></li>
+                            <li id="over"><label class="double">Višina letnih doh. je med 10.342,8€ in 11.965,2€:</label><div class="icon over active" ></div><div class="control onoff"></div></li>
+                        </ul>
+                        
+                        <br class="clear" />
+                    </div>    		
+                    <div class="button main"></div>
+                    <div class="button info"></div>
+                </div>
+            </div>
+            <div id="info" class="page">
+                <h2>Dodatne informacije</h2>
+                <div class="wrapper">
+                    <p>Si ne bi želeli tako enostavnega izračuna plač tudi v vašem podjetju?</p>
+										<p>Pokličite zdaj <strong>01 600 7000</strong></p>
+										<p>&nbsp;</p>
+										<p>
+											SRC d.o.o.<br />
+											Tržaška cesta 116<br />
+											1001 Ljubljana<br />
+											e-pošta: src@src.si<br />
+											splet: www.src.si
+										</p>
+										
+										<iframe width="288" height="288" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Tr%C5%BEa%C5%A1ka+116,+Ljubljana&amp;aq=&amp;sll=37.0625,-95.677068&amp;sspn=43.307813,64.775391&amp;t=h&amp;ie=UTF8&amp;hq=&amp;hnear=Tr%C5%BEa%C5%A1ka+cesta+116,+1000+Ljubljana,+Slovenia&amp;ll=46.039697,14.472342&amp;spn=0.017159,0.024633&amp;z=14&amp;iwloc=A&amp;output=embed"></iframe>
+										
+                    <div id="console"></div>
+                    <div class="button main"></div>
+                    
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

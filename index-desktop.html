@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <title>OPLA obračun plač - DEMO</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.path.js"></script>
+    <script type="text/javascript" src="js/control.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        demoCalc(); // init
+        //$("#holder").click(rotate);
+    
+        var $box = $('#wheel');
+        
+        // selector (jQuery selector for div / area)
+        var bWidth = $box.width();
+        var bHeight = $box.height();
+        
+
+        // bind event
+        $box.mousemove(function(e){
+            var coordinates = areaToCoornite(bWidth, bHeight, e.layerY, e.layerX);
+            //console.log(e);
+            var r = xyToDeg(coordinates.y, coordinates.x);
+            rotate(r);
+            $('#console').html(r);
+
+        });
+    
+    });
+</script>    
+</head>
+
+
+<body>
+    <div id="main" class="front">
+        <div id="top-inp"></div>
+        <div id="val1" class="values"></div>
+        <div id="val2" class="values"></div>
+        <div id="val3" class="values"></div>
+        <div id="val4" class="values"></div>
+        <div id="holder"></div>
+        <div id="wheel"></div>
+    </div>
+    <div id="console"></div>
+
+</body>
+</html>
